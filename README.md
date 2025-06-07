@@ -41,8 +41,8 @@ The goal of this pipeline is to ingest simulated energy data from multiple sites
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/energy-data-pipeline.git
-cd energy-data-pipeline
+git clone https://github.com/RajeshShahu1/renewable-energy-data-pipeline.git
+cd renewable-energy-data-pipeline
 
 # Create and activate virtual environment
 python -m venv venv
@@ -54,43 +54,37 @@ pip install -r requirements.txt
 
 ### ☁️ AWS Resource Setup
 
-* **S3 Bucket** (e.g., `renewable-energy-data1`) for simulated data uploads
+* **S3 Bucket** ('renewable-energy-data1') for simulated data uploads
 * **DynamoDB Table** (`energy_data`)
 
   * Partition key: `site_id`
   * Sort key: `timestamp`
-* **SNS Topic** (e.g., `energy-anomaly-alerts`) with email subscription
+* **SNS Topic** (`energy-anomaly-alerts`) with email subscription
 * **IAM Role** with permissions: S3, DynamoDB, SNS, Lambda, CloudWatch
 * **CloudWatch Logs** (automatically integrated with Lambda)
 
 ---
 
-## 🚀 How to Run Components
+## How to Run Components
 
-### 🔁 Simulated Data Feed
+### Simulated Data Feed
 
 Continuously uploads JSON files with energy data to S3.
 
 ```bash
-python simulate_feed.py
+python main.py
 ```
 
-### 🧠 Lambda Function
+### Lambda Function
 
 Triggered on every S3 upload. Performs:
 
 * Parsing and validation
-* Anomaly detection (e.g., negative generation or >25% deviation)
+* Anomaly detection 
 * Storing processed records in DynamoDB
 * Sending alert via SNS (if anomaly found)
 
-### 🧪 Test Alert Manually
-
-```bash
-GET /test-alert
-```
-
-### 🌐 Run FastAPI Backend
+### Run FastAPI Backend
 
 ```bash
 uvicorn dynamodb_api_fastapi:app --reload
@@ -187,9 +181,4 @@ Created by **\[Your Name]**
 
 ---
 
-## 🏗️ Future Improvements
 
-* Add CI/CD using GitHub Actions
-* Deploy FastAPI on AWS Lambda (via API Gateway)
-* Enhance data schema & validations
-* Add user authentication for APIs
