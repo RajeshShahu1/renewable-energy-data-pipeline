@@ -24,6 +24,7 @@ The goal of this pipeline is to ingest simulated energy data from multiple sites
 ---
 
 ## Architecture
+![Architecture.png](Architecture.png)
 
 ---
 
