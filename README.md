@@ -2,24 +2,25 @@
 
 # Renewable Energy Data Pipeline Using AWS Services
 
-This project demonstrates a real-time energy data pipeline using AWS services like S3, Lambda, DynamoDB, CloudWatch and SNS, along with FastAPI and Python for API access and visualization.
+This project showcases a fully integrated, real-time energy data pipeline built using AWS services such as S3, Lambda, DynamoDB, CloudWatch, AWS CLI and SNS. It leverages Python and FastAPI to enable API-driven access and insightful visualizations, providing a robust and scalable solution for monitoring and analyzing renewable energy data.
 
 ---
 
 ## Project Overview
 
-The goal of this pipeline is to ingest simulated energy data from multiple sites, process and store it in DynamoDB in a scalable manner, detect anomalies, trigger real-time alerts, and visualize trends through dashboards.
+The objective of this project is to build a real-time data pipeline that simulates energy data from multiple renewable energy sites. The system ingests and processes data using AWS Lambda, stores it in DynamoDB, detects anomalies, and sends real-time alerts via SNS. It also includes API access for querying data and generates insightful visualizations for monitoring trends and performance.
 
 **The project leverages the following tools and services:**
 
-- **Python**: Simulated live data feed 
-- **Amazon S3**:File storage & event triggers
-- **AWS Lambda**: Real-time processing
-- **DynamoDB**: Processed data storage
-- **FastAPI**: API access
+- **Python**: Simulated live data feed generation 
+- **Amazon S3**:File storage and event-based trigger for ingestion
+- **AWS Lambda**: Real-time processing and anomaly detection
+- **DynamoDB**: Scalable NoSQL storage for processed data
+- **FastAPI**: Lightweight REST API framework for querying and alerts
 - **Amazon SNS**: Anomaly detection & alerts
-- **Seaborn/Matplotlib**: Data visualization 
-- **Amazon CloudWatch**: Logging and monitoring
+- **Seaborn/Matplotlib**: Static data visualizations and trends 
+- **Amazon CloudWatch**: Centralized logging and monitoring for Lambda
+- **AWS CLI**: Infrastructure provisioning and automation (IaC)
 
 ---
 
@@ -37,7 +38,7 @@ The goal of this pipeline is to ingest simulated energy data from multiple sites
 * Python 3.8 or later
 * `virtualenv` installed
 
-### 📁 Local Environment Setup
+### Local Environment Setup
 
 ```bash
 # Clone the repository
@@ -52,7 +53,7 @@ source venv/bin/activate  # or venv\Scripts\activate on Windows
 pip install -r requirements.txt
 ```
 
-### ☁️ AWS Resource Setup
+### AWS Resource Setup
 
 * **S3 Bucket** ('renewable-energy-data1') for simulated data uploads
 * **DynamoDB Table** (`energy_data`)
