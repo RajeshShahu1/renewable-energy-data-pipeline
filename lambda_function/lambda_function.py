@@ -2,6 +2,12 @@ import json
 import boto3
 from decimal import Decimal
 
+# Trigger CI/CD test
+git add lambda_function/lambda_function.py
+git commit -m "Test GitHub Actions deployment"
+git push origin main
+
+
 # Initialize DynamoDB
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('energy_data')  
