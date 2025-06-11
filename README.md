@@ -29,14 +29,29 @@ The objective of this project is to build a real-time data pipeline that simulat
 
 ---
 
-## 🔧 Setup Instructions
+## Setup Instructions
 
-### 🛠️ Prerequisites
+### Prerequisites
 
 * AWS Account (with admin or necessary permissions)
 * AWS CLI configured
+```bash
+   aws configure
+```
 * Python 3.8 or later
 * `virtualenv` installed
+
+### Infrastructure Deployment (AWS CLI)
+
+From the infrastructure/ folder, run:
+```bash
+   infrastructure_setup.sh
+```
+Ensure the following files are in this folder:
+
+* trust-policy.json
+* s3_event.json
+* lambda_function.py
 
 ### Local Environment Setup
 
@@ -77,7 +92,7 @@ pip install -r requirements.txt
 Continuously uploads JSON files with energy data to S3.
 
 ```bash
-python main.py
+python simulated_data_feed.py
 ```
 
 ### Lambda Function
@@ -95,36 +110,12 @@ Triggered on every S3 upload. Performs:
 uvicorn dynamodb_api_fastapi:app --reload
 ```
 
-Access docs:
+Access Swagger docs at:
 
 ```
 http://localhost:8000/docs
 ```
-
----
-
-## 📊 How to Visualize Data
-
-Run the visualization script:
-
-```bash
-python visualize.py
-```
-
-Generates the following charts:
-
-* Energy Generated vs Consumed (line chart)
-* Net Energy Distribution (box plot)
-* Anomaly Rate (%) per site
-* Total kWh per site (stacked bar)
-* Anomalies per site (bar)
-* Timeline of anomalies (scatter)
-
-All graphs are saved in the `/outputs` directory.
-
----
-
-## 🌐 How to Use the API
+### How to Use the API
 
 ### `/records`
 
@@ -133,7 +124,6 @@ Fetch records by site and optional time range.
 ```
 GET /records?site_id=SolarFarm_AZ_001&start_time=2025-06-06T00:00:00&end_time=2025-06-06T23:59:59
 ```
-
 ### `/anomalies`
 
 Fetch anomalies for a specific site.
@@ -141,8 +131,17 @@ Fetch anomalies for a specific site.
 ```
 GET /anomalies?site_id=BatteryBank_TX_005
 ```
+---
 
-## 🛠️ Design Decisions
+## How to Visualize Data
+
+Run the visualization script:
+
+```bash
+python visualization.py
+```
+---
+## Design Decisions
 
 * **S3 → Lambda → DynamoDB**: Serverless and scalable data ingestion pattern.
 * **SNS for alerts**: Enables real-time anomaly notification (email/SMS).
@@ -153,36 +152,18 @@ GET /anomalies?site_id=BatteryBank_TX_005
 
 ---
 
-## 📂 Folder Structure
-
-```
-energy-data-pipeline/
-│
-├── simulate_feed.py              # S3 uploader for simulated data
-├── lambda_function.py            # AWS Lambda processing logic
-├── dynamodb_api_fastapi.py       # FastAPI app for data querying & alerts
-├── visualize.py                  # Visualization script
-├── requirements.txt
-├── README.md
-└── outputs/                      # Saved PNG charts
-```
-
----
-
-
-
-## 📽️ Demo Video (to be added)
+## Demo Video (to be added)
 
 📎 Link to your video demonstration of the project
 🧾 Walkthrough of key features, decisions, and usage instructions
 
 ---
 
-## 📬 Contact
+## Contact
 
-Created by **\[Your Name]**
-📧 Email: [your.email@example.com](mailto:your.email@example.com)
-🔗 [LinkedIn](https://linkedin.com/in/your-profile)
+Created by **\[Rajesh Shahu]**
+📧 Email: [rajshahu4446@gmail.com](mailto:rajshahu4446@gmail.com)
+🔗 [LinkedIn](https://linkedin.com/in/rajeshshahu)
 
 ---
 
