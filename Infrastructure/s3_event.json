@@ -1,0 +1,9 @@
+{
+  "LambdaFunctionConfigurations": [
+    {
+      "Id": "triggerLambdaOnUpload",
+      "LambdaFunctionArn": "arn:aws:lambda:us-west-2:<YOUR_ACCOUNT_ID>:function/ProcessEnergyData",
+      "Events": ["s3:ObjectCreated:*"]
+    }
+  ]
+}
