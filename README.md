@@ -1,6 +1,6 @@
 
 
-# Renewable Energy Data Pipeline Using AWS Services
+# Renewable Energy Dat End-to-End Pipeline Using AWS Services
 
 This project showcases a fully integrated, real-time energy data pipeline built using AWS services such as S3, Lambda, DynamoDB, CloudWatch, AWS CLI and SNS. It leverages Python and FastAPI to enable API-driven access and insightful visualizations, providing a robust and scalable solution for monitoring and analyzing renewable energy data.
 
@@ -17,10 +17,11 @@ The objective of this project is to build a real-time data pipeline that simulat
 - **AWS Lambda**: Real-time processing and anomaly detection
 - **DynamoDB**: Scalable NoSQL storage for processed data
 - **FastAPI**: Lightweight REST API framework for querying and alerts
-- **Amazon SNS**: Anomaly detection & alerts
-- **Seaborn/Matplotlib**: Static data visualizations and trends 
+- **Amazon SNS**: Anomaly detection & real-time alerts
+- **Seaborn/Matplotlib/Plotly**: Static data visualizations and trends 
 - **Amazon CloudWatch**: Centralized logging and monitoring for Lambda
 - **AWS CLI**: Infrastructure provisioning and automation (IaC)
+- **GitHub Actions**: CI/CD automation for Lambda deployments
 
 ---
 
@@ -33,25 +34,24 @@ The objective of this project is to build a real-time data pipeline that simulat
 
 ### Prerequisites
 
-* AWS Account (with admin or necessary permissions)
-* AWS CLI configured
+* AWS Account (with admin or necessary permissions for S3, DynamoDB, Lambda, IAM, AmazonSNS, CloudWatch.)
+* Download and install AWS CLI from https://aws.amazon.com/cli/
+* Python 3.8 or later https://www.python.org/downloads/
+* download and install Git from https://git-scm.com/downloads
+* `virtualenv` installed
+* Note: This project uses AWS Free Tier resources
+  
+### Configuration of AWS
+Open your command prompt or terminal and run the following command:
 ```bash
    aws configure
 ```
-* Python 3.8 or later
-* `virtualenv` installed
+When prompted, provide your AWS credentials:
 
-### Infrastructure Deployment (AWS CLI)
-
-From the infrastructure/ folder, run:
-```bash
-   infrastructure_setup.sh
-```
-Ensure the following files are in this folder:
-
-* trust-policy.json
-* s3_event.json
-* lambda_function.py
+* Enter your AWS Access Key ID
+* Enter your AWS Secret Access Key
+* Set the default region as us-east-1
+* Choose json as the default output format
 
 ### Local Environment Setup
 
@@ -67,7 +67,26 @@ source venv/bin/activate  # or venv\Scripts\activate on Windows
 # Install dependencies
 pip install -r requirements.txt
 ```
+### Infrastructure Deployment (AWS CLI)
 
+From the infrastructure/ folder, run:
+```bash
+   infrastructure_setup.sh
+```
+Ensure the following files are in this folder:
+
+* trust-policy.json
+* s3_event.json
+* lambda_function.py
+
+Resources created:
+
+* S3 bucket for data ingestion
+* DynamoDB table: energy_data
+* Lambda function triggered by S3
+* SNS topic for alerts
+* IAM role and policies
+  
 ### AWS Resource Setup
 
 * **S3 Bucket** ('renewable-energy-data1') for simulated data uploads
@@ -87,11 +106,13 @@ pip install -r requirements.txt
 
 ## How to Run Components
 
-### Simulated Data Feed
+### Start Simulated Live Data Feed
 
 Continuously uploads JSON files with energy data to S3.
-
+run:
 ```bash
+cd data_generation
+pip install -r requirements.txt
 python simulated_data_feed.py
 ```
 
@@ -99,7 +120,7 @@ python simulated_data_feed.py
 
 Triggered on every S3 upload. Performs:
 
-* Parsing and validation
+* Parsing and validation JSON
 * Anomaly detection 
 * Storing processed records in DynamoDB
 * Sending alert via SNS (if anomaly found)
@@ -107,6 +128,8 @@ Triggered on every S3 upload. Performs:
 ### Run FastAPI Backend
 
 ```bash
+cd APIs
+pip install -r requirements.txt
 uvicorn dynamodb_api_fastapi:app --reload
 ```
 
@@ -131,6 +154,9 @@ Fetch anomalies for a specific site.
 ```
 GET /anomalies?site_id=BatteryBank_TX_005
 ```
+The FastAPI backend runs locally on http://localhost:8000 when launched using Uvicorn./records
+returns energy data (generated, consumed, net) for a given site_id within an optional time range./anomalies returns only records with anomalies (e.g., negative or unusually high values) for a specific site_id. 
+
 ---
 
 ## How to Visualize Data
@@ -138,8 +164,103 @@ GET /anomalies?site_id=BatteryBank_TX_005
 Run the visualization script:
 
 ```bash
+cd visualization
+pip install -r requirements.txt
 python visualization.py
 ```
+---
+## GitHub Setup & CI/CD Pipeline
+Step 1: Initialize GitHub Repository
+```bash
+git init
+git remote add origin https://github.com/RajeshShahu1/renewable-energy-data-pipeline.git
+git add .
+git commit -m "Initial commit"
+git push -u origin main
+```
+Step 2: Set Up GitHub Secrets
+In your GitHub repository:
+
+Go to Settings > Secrets > Actions > New repository secret
+
+Add the following secrets:
+
+* AWS_ACCESS_KEY_ID
+* AWS_SECRET_ACCESS_KEY
+* AWS_REGION
+  
+Step 3: Configure CI/CD Workflow
+Create a file: .github/workflows/deploy.yml
+```bash
+name: Deploy Lambda Function
+on:
+  push:
+     -'lambda_function/**'
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+        name: Install dependencies
+        working-directory: lambda_function
+        run:
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -t .
+
+        name: Zip Lambda code
+        run: |
+          cd lambda_function
+          zip -r ../lambda_function.zip .
+        - name: Deploy to AWS Lambda
+          uses: appleboy/lambda-action@master
+          with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: 'us-west-2'
+          function_name: 'ProcessEnergyData'
+          zip_file: 'lambda_function.zip'
+```
+Push changes to trigger deployment:
+```bash
+git add .
+git commit -m "Trigger CI/CD pipeline"
+git push origin main
+```
+---
+## Monitoring & Debugging
+```bash
+# View uploaded files in S3
+aws s3 ls s3://renewable-energy-data1 --recursive
+
+# View recent records in DynamoDB
+aws dynamodb scan --table-name energy_data --limit 5
+
+# Stream Lambda logs from CloudWatch
+aws logs tail /aws/lambda/renewable-energy-pipeline-lambda --follow
+
+# Manually invoke the Lambda function
+aws lambda invoke --function-name renewable-energy-pipeline-lambda output.json
+
+# Check SNS topics
+aws sns list-topics
+
+# Check IAM role permissions
+aws iam list-attached-role-policies --role-name renewable-energy-lambda-role
+```
+---
+## Troubleshooting
+* Lambda not triggering? Verify S3 event notifications and IAM permissions
+* DynamoDB permission denied? Update Lambda IAM role
+* API not responding? Check that FastAPI is running and no port conflicts exist
+* No Visualization data? Confirm data is in DynamoDB and table name is correct
 ---
 ## Design Decisions
 
@@ -149,9 +270,16 @@ python visualization.py
 * **CloudWatch**: Logs every Lambda execution and captures errors.
 * **DynamoDB**: Low-latency NoSQL storage for high-throughput access.
 * **Seaborn/Matplotlib**: Easy and polished static chart generation.
-
 ---
-
+## Cleanup Instructions
+To delete AWS resources...
+```bash
+aws s3 rm s3://renewable-energy-data1 --recursive
+aws s3 rb s3://renewable-energy-data1
+aws dynamodb delete-table --table-name energy_data
+aws lambda delete-function --function-name ProcessEnergyData
+```
+---
 ## Demo Video (to be added)
 
 📎 Link to your video demonstration of the project
