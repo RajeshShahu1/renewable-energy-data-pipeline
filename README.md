@@ -1,6 +1,6 @@
 
 
-# Renewable Energy Dat End-to-End Pipeline Using AWS Services
+# Renewable Energy Data End-to-End Pipeline Using AWS Services
 
 This project showcases a fully integrated, real-time energy data pipeline built using AWS services such as S3, Lambda, DynamoDB, CloudWatch, AWS CLI and SNS. It leverages Python and FastAPI to enable API-driven access and insightful visualizations, providing a robust and scalable solution for monitoring and analyzing renewable energy data.
 
