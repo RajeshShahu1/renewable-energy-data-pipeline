@@ -280,12 +280,6 @@ aws dynamodb delete-table --table-name energy_data
 aws lambda delete-function --function-name ProcessEnergyData
 ```
 ---
-## Demo Video (to be added)
-
-📎 Link to your video demonstration of the project
-🧾 Walkthrough of key features, decisions, and usage instructions
-
----
 
 ## Contact
 
